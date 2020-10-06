@@ -5,13 +5,13 @@ RUN apt-get update && \
         apt-get install -y curl xz-utils jq
 
 WORKDIR /app
-COPY ./entrypoint.sh ./entrypoint.sh
 RUN curl -L -o factorio.tar.xz https://www.factorio.com/get-download/1.0.0/headless/linux64
 RUN tar xf factorio.tar.xz
 RUN mv factorio/* .
 RUN rm -rf factorio factorio.tar.xz
 ENV PATH="$PATH:/app/bin/x64"
 RUN factorio --version
+COPY ./entrypoint.sh ./entrypoint.sh
 
 ENV FACTORIO_SERVER_PORT=34197
 ENV FACTORIO_SERVER_PASSWORD=""
