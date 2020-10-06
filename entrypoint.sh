@@ -13,6 +13,10 @@ else
   echo "A map has already been generated!"
 fi
 
+if [ ! -f "/config/server-adminlist.json" ]; then
+  echo "[]" > /config/server-adminlist.json
+fi
+
 jq \
   --arg serverName "$FACTORIO_SERVER_NAME" \
   --arg serverDescription "$FACTORIO_SERVER_DESCRIPTION" \
@@ -37,5 +41,6 @@ factorio --start-server "/config/world" \
     --map-settings /config/map-settings.json \
     --mod-directory /config/mods \
     --console-log /config/server.log \
-    --server-banlist /config/server-banlist.json
+    --server-banlist /config/server-banlist.json \
+    --server-adminlist /config/server-adminlist.json
 
