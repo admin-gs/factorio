@@ -1,13 +1,11 @@
 #!/bin/bash
-instanceName="default"
-savesPath="/app/saves"
 
-if [ ! -d $savesPath ]; then
+if [ ! -d "/app/saves/default" ]; then
   echo "This is the first run, generating map...."
-  factorio --create /app/saves/$instanceName;
+  factorio --create "/app/saves/default";
 else
   echo "A map has already been generated!"
 fi
 
 echo "Starting..."
-factorio --start-server-load-latest
+factorio --start-server "/app/saves/default"
