@@ -1,46 +1,33 @@
 #!/bin/bash
 
-if [ ! -f "/config/world.zip" ]; then
-  echo "This is the first run, generating map...."
-  mkdir -p /config
-  cp -n /app/data/server-settings.example.json /config/server-settings.json
-  cp -n /app/data/map-gen-settings.example.json /config/map-gen-settings.json
-  cp -n /app/data/map-settings.example.json /config/map-settings.json
-  factorio --create "/config/world" \
-    --map-gen-settings /config/map-gen-settings.json \
-    --map-settings /config/map-settings.json \
-else
-  echo "A map has already been generated!"
-fi
-
-if [ ! -f "/config/server-adminlist.json" ]; then
-  echo "[]" > /config/server-adminlist.json
-fi
-
+echo "Generating server config..."
 jq \
   --arg serverName "$FACTORIO_SERVER_NAME" \
   --arg serverDescription "$FACTORIO_SERVER_DESCRIPTION" \
   --arg serverPassword "$FACTORIO_SERVER_PASSWORD" \
   --arg serverUsername "$FACTORIO_SERVER_USERNAME" \
   --arg serverToken "$FACTORIO_SERVER_TOKEN" \
+  --argjson serverSettings "$FACTORIO_SERVER_SETTINGS" \
   '. + {
     "name": $serverName,
     "description": $serverDescription,
     "game_password": $serverPassword,
     "username": $serverUsername,
     "token": $serverToken
-   }' \
-   /config/server-settings.json > /config/server-settings.json.bak && \
-   mv /config/server-settings.json.bak /config/server-settings.json
+   } + $serverSettings' \
+   /app/data/server-settings.example.json > /app/data/server-settings.json
+
+if [ ! -f "/config/world.zip" ]; then
+  echo "This is the first run, generating map...."
+  mkdir -p /config
+  factorio --create "/config/world"
+else
+  echo "A map has already been generated!"
+fi
+
 
 echo "Starting..."
 factorio --start-server "/config/world" \
     --port "$FACTORIO_SERVER_PORT" \
-    --server-settings /config/server-settings.json \
-    --map-gen-settings /config/map-gen-settings.json \
-    --map-settings /config/map-settings.json \
     --mod-directory /config/mods \
-    --console-log /config/server.log \
-    --server-banlist /config/server-banlist.json \
-    --server-adminlist /config/server-adminlist.json
-
+    --console-log /config/server.log
